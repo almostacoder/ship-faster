@@ -1,0 +1,5 @@
+{
+  "name": "Agent System Context Debugger",
+  "description": "Visual debugger for AI agent context windows showing token usage and memory bottlenecks.",
+  "requestFramePermissions": []
+}

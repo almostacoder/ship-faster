@@ -64,6 +64,8 @@ Templates are runnable, full projects you can start from. Each template is self-
 
 | `032-deep-research-evaluation-platform` | Deep Research Evaluation Platform | [`032-deep-research-evaluation-platform/`](032-deep-research-evaluation-platform/) |
 
+| `033-agent-system-context-debugger` | Agent System Context Debugger | [`033-agent-system-context-debugger/`](033-agent-system-context-debugger/) |
+
 ## Usage
 
 1. Enter a template directory (example: `templates/001-copyback-studio`).
