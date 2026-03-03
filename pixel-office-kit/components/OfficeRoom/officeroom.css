@@ -50,6 +50,20 @@
   to { stroke-dashoffset: -10; }
 }
 
+.or-talk-line {
+  stroke: #3b82f6;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  fill: none;
+  opacity: 0.7;
+  animation: or-dash-flow 0.8s linear infinite;
+}
+
+@keyframes or-dash-flow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -16; }
+}
+
 .or-agent {
   position: absolute;
   top: 0;
@@ -241,7 +255,8 @@
   50% { transform: translateX(-50%) translateY(-6px) scale(1.1); }
 }
 
-.or-idle .or-body { opacity: 0.95; }
+.or-idle .or-body { opacity: 0.95; animation: or-idle-breathe 4s ease-in-out infinite; }
+@keyframes or-idle-breathe { 50% { transform: scaleY(0.985); } }
 .or-idle .or-head { filter: grayscale(0.05); }
 
 .or-head-reply {
@@ -411,7 +426,7 @@
 .or-walk-js .or-body { animation: none; }
 .or-walk-js .or-head { animation: or-head-bounce 0.2s ease-in-out infinite; }
 
-.or-sit-offset .or-bob { transform: translateY(12px); }
+.or-sit-offset .or-bob { transform: translateY(0); }
 
 .or-monitor-screen {
   position: absolute;
@@ -521,7 +536,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .or-agent, .or-bob, .or-body, .or-head, .or-lines line, .or-bubble,
+  .or-agent, .or-bob, .or-body, .or-head, .or-lines line, .or-talk-line, .or-bubble,
   .or-emotion-icon, .or-wave-hand, .or-monitor-screen,
   .or-steam-p, .or-fridge-light {
     animation: none !important;

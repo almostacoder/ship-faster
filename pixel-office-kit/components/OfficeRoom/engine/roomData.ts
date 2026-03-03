@@ -70,28 +70,40 @@ export interface Workstation {
 
 export const WORKSTATIONS: Workstation[] = [
   {
-    agentId: 'coordinator', color: '#f59e0b',
+    agentId: 'minion', color: '#f59e0b',
     seatCol: 4, seatRow: 6,
     seatPx: { x: 4 * TILE_SIZE + TILE_SIZE / 2, y: 6 * TILE_SIZE + TILE_SIZE / 2 },
     deskCols: [3, 4, 5], deskRows: [4, 5], facingDir: 'up',
   },
   {
-    agentId: 'researcher', color: '#8b5cf6',
+    agentId: 'sage', color: '#8b5cf6',
     seatCol: 8, seatRow: 6,
     seatPx: { x: 8 * TILE_SIZE + TILE_SIZE / 2, y: 6 * TILE_SIZE + TILE_SIZE / 2 },
     deskCols: [7, 8, 9], deskRows: [4, 5], facingDir: 'up',
   },
   {
-    agentId: 'writer', color: '#10b981',
+    agentId: 'scout', color: '#10b981',
     seatCol: 12, seatRow: 6,
     seatPx: { x: 12 * TILE_SIZE + TILE_SIZE / 2, y: 6 * TILE_SIZE + TILE_SIZE / 2 },
     deskCols: [11, 12, 13], deskRows: [4, 5], facingDir: 'up',
   },
   {
-    agentId: 'observer', color: '#0ea5e9',
+    agentId: 'quill', color: '#0ea5e9',
     seatCol: 18, seatRow: 6,
     seatPx: { x: 18 * TILE_SIZE + TILE_SIZE / 2, y: 6 * TILE_SIZE + TILE_SIZE / 2 },
     deskCols: [17, 18, 19], deskRows: [4, 5], facingDir: 'up',
+  },
+  {
+    agentId: 'xalt', color: '#f43f5e',
+    seatCol: 22, seatRow: 6,
+    seatPx: { x: 22 * TILE_SIZE + TILE_SIZE / 2, y: 6 * TILE_SIZE + TILE_SIZE / 2 },
+    deskCols: [21, 22, 23], deskRows: [4, 5], facingDir: 'up',
+  },
+  {
+    agentId: 'observer', color: '#14b8a6',
+    seatCol: 32, seatRow: 6,
+    seatPx: { x: 32 * TILE_SIZE + TILE_SIZE / 2, y: 6 * TILE_SIZE + TILE_SIZE / 2 },
+    deskCols: [31, 32, 33], deskRows: [4, 5], facingDir: 'up',
   },
 ];
 
@@ -122,6 +134,24 @@ export function buildWalkableGrid(): boolean[][] {
   }
   return grid;
 }
+
+export const LAYOUT = {
+  tile: { size: TILE_SIZE, cols: ROOM_COLS, rows: ROOM_ROWS },
+  scale: SCALE,
+  canvas: { nativeW: NATIVE_W, nativeH: NATIVE_H, displayW: DISPLAY_W, displayH: DISPLAY_H },
+  furniture: {
+    whiteboard: { col: 1, row: 1 },
+    window: { col: 14, row: 1 },
+    clock: { col: 18, row: 1 },
+    sofa: { col: 31, row: 2 },
+    artFrame: { col: 28, row: 1 },
+    fridge: { col: 31, row: 9 },
+    coffeeMachine: { col: 27, row: 8 },
+    meetingTable: { col: 9, row: 9 },
+    plants: [{ col: 7, row: 8 }, { col: 25, row: 7 }],
+  },
+  lights: { office: [6, 18], lounge: [27, 33] },
+} as const;
 
 export function getTimeOfDay(hour: number): 'night' | 'dawn' | 'morning' | 'day' | 'sunset' | 'dusk' {
   if (hour >= 21 || hour < 5) return 'night';

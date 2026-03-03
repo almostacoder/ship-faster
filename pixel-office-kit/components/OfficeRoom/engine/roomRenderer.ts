@@ -1,6 +1,6 @@
 import {
   TILE_SIZE, ROOM_COLS, ROOM_ROWS, ROOM_MAP, TileType,
-  WORKSTATIONS, OFFICE_ZONE_COL, COMMON_AREAS,
+  WORKSTATIONS, OFFICE_ZONE_COL, COMMON_AREAS, LAYOUT,
   getTimeOfDay, SKY_COLORS,
 } from './roomData';
 import { hexColorAlpha } from './spriteFactory';
@@ -46,11 +46,12 @@ export function renderRoom(
   drawZoneDivider(ctx, H);
   drawDesks(ctx, agents, time);
   drawWhiteboard(ctx);
-  drawWindow(ctx, hour);
+  drawWindow(ctx, hour, time);
   drawClock(ctx, hour);
   drawMeetingTable(ctx);
   drawLoungeArea(ctx);
-  drawCeilingLights(ctx);
+  drawPlants(ctx, time);
+  drawCeilingLights(ctx, time);
   drawVignette(ctx, W, H, hour);
 }
 
@@ -91,6 +92,12 @@ function drawFloor(ctx: CanvasRenderingContext2D): void {
     ctx.lineTo(x, (ROOM_ROWS - 1) * TILE_SIZE);
     ctx.stroke();
   }
+
+  const floorStartY = 4 * TILE_SIZE;
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.fillRect(0, floorStartY, ROOM_COLS * TILE_SIZE, 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.04)';
+  ctx.fillRect(0, floorStartY + 2, ROOM_COLS * TILE_SIZE, 2);
 }
 
 function drawWalls(ctx: CanvasRenderingContext2D): void {
@@ -128,16 +135,29 @@ function drawBaseboard(ctx: CanvasRenderingContext2D): void {
   ctx.fillRect(0, y + TILE_SIZE / 2, ozPx, 1);
   ctx.fillStyle = BASEBOARD_PURPLE;
   ctx.fillRect(ozPx, y + TILE_SIZE / 2, w - ozPx, 1);
+  ctx.fillStyle = 'rgba(0,200,255,0.10)';
+  ctx.fillRect(0, y + TILE_SIZE / 2 + 2, ozPx, 1);
+  ctx.fillStyle = 'rgba(180,100,255,0.15)';
+  ctx.fillRect(ozPx, y + TILE_SIZE / 2 + 2, w - ozPx, 1);
 }
 
 function drawZoneDivider(ctx: CanvasRenderingContext2D, h: number): void {
   const x = OFFICE_ZONE_COL * TILE_SIZE;
   ctx.fillStyle = '#0a0e16';
+  ctx.fillRect(x - 2, 0, 4, h);
+  ctx.fillStyle = '#101620';
   ctx.fillRect(x - 1, 0, 2, h);
-  ctx.fillStyle = 'rgba(0,200,255,0.15)';
+  ctx.fillStyle = 'rgba(0,200,255,0.18)';
   ctx.fillRect(x - 1, 0, 1, h);
-  ctx.fillStyle = 'rgba(180,100,255,0.15)';
+  ctx.fillStyle = 'rgba(180,100,255,0.18)';
   ctx.fillRect(x, 0, 1, h);
+
+  for (let ny = 4 * TILE_SIZE; ny < h - TILE_SIZE; ny += 3 * TILE_SIZE) {
+    ctx.fillStyle = 'rgba(0,200,255,0.08)';
+    ctx.fillRect(x - 2, ny, 1, 3);
+    ctx.fillStyle = 'rgba(180,100,255,0.08)';
+    ctx.fillRect(x + 1, ny, 1, 3);
+  }
 }
 
 function drawDesks(ctx: CanvasRenderingContext2D, agents: AgentEntity[], time: number): void {
@@ -211,11 +231,11 @@ function drawWhiteboard(ctx: CanvasRenderingContext2D): void {
   ctx.fillRect(x + w - 1, y, 1, h);
 }
 
-function drawWindow(ctx: CanvasRenderingContext2D, hour: number): void {
+function drawWindow(ctx: CanvasRenderingContext2D, hour: number, time: number): void {
   const tod = getTimeOfDay(hour);
   const skyColor = SKY_COLORS[tod].sky;
-  const x = 14 * TILE_SIZE;
-  const y = 1 * TILE_SIZE;
+  const x = LAYOUT.furniture.window.col * TILE_SIZE;
+  const y = LAYOUT.furniture.window.row * TILE_SIZE;
   const w = 4 * TILE_SIZE;
   const h = 2 * TILE_SIZE;
 
@@ -225,15 +245,18 @@ function drawWindow(ctx: CanvasRenderingContext2D, hour: number): void {
   ctx.fillRect(x, y, w, h);
 
   if (tod !== 'night' && tod !== 'dusk') {
+    const drift = time * 0.005;
     ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.fillRect(x + 4, y + 5, 10, 5);
-    ctx.fillRect(x + 20, y + 7, 14, 4);
+    ctx.fillRect(x + ((4 + drift) % w), y + 5, 10, 5);
+    ctx.fillRect(x + ((20 + drift * 0.7) % w), y + 7, 14, 4);
   }
 
   if (tod === 'night') {
-    ctx.fillStyle = '#ffffff';
     const stars = [[6, 5], [22, 10], [38, 7], [12, 18], [30, 4]];
-    for (const [sx, sy] of stars) {
+    for (let i = 0; i < stars.length; i++) {
+      const [sx, sy] = stars[i];
+      const alpha = 0.5 + Math.sin(time * 0.002 + i) * 0.4;
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
       ctx.fillRect(x + sx, y + sy, 1, 1);
     }
   }
@@ -394,9 +417,10 @@ function drawLoungeArea(ctx: CanvasRenderingContext2D): void {
   ctx.fillRect(artX + 21, artY + 3, 5, 5);
 }
 
-function drawCeilingLights(ctx: CanvasRenderingContext2D): void {
-  const officeLamps = [6, 18];
-  for (const col of officeLamps) {
+function drawCeilingLights(ctx: CanvasRenderingContext2D, time: number): void {
+  const officeLamps = LAYOUT.lights.office;
+  for (let i = 0; i < officeLamps.length; i++) {
+    const col = officeLamps[i];
     const x = col * TILE_SIZE + TILE_SIZE / 2;
     ctx.fillStyle = '#2a3040';
     ctx.fillRect(x - 1, 0, 2, 5);
@@ -405,15 +429,17 @@ function drawCeilingLights(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = '#80e0ff';
     ctx.fillRect(x - 2, 8, 4, 2);
 
+    const breathAlpha = 0.10 + Math.sin(time * 0.001 + i) * 0.02;
     const lg = ctx.createRadialGradient(x, 60, 0, x, 60, 50);
-    lg.addColorStop(0, 'rgba(0,200,255,0.10)');
+    lg.addColorStop(0, `rgba(0,200,255,${breathAlpha})`);
     lg.addColorStop(1, 'rgba(0,200,255,0)');
     ctx.fillStyle = lg;
     ctx.fillRect(x - 50, 10, 100, 100);
   }
 
-  const loungeLamps = [27, 33];
-  for (const col of loungeLamps) {
+  const loungeLamps = LAYOUT.lights.lounge;
+  for (let i = 0; i < loungeLamps.length; i++) {
+    const col = loungeLamps[i];
     const x = col * TILE_SIZE + TILE_SIZE / 2;
     ctx.fillStyle = '#2a3040';
     ctx.fillRect(x - 1, 0, 2, 5);
@@ -422,11 +448,35 @@ function drawCeilingLights(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = '#c08fff';
     ctx.fillRect(x - 2, 8, 4, 2);
 
+    const breathAlpha = 0.10 + Math.sin(time * 0.001 + i + 2) * 0.02;
     const lg = ctx.createRadialGradient(x, 60, 0, x, 60, 50);
-    lg.addColorStop(0, 'rgba(180,100,255,0.10)');
+    lg.addColorStop(0, `rgba(180,100,255,${breathAlpha})`);
     lg.addColorStop(1, 'rgba(180,100,255,0)');
     ctx.fillStyle = lg;
     ctx.fillRect(x - 50, 10, 100, 100);
+  }
+}
+
+function drawPlants(ctx: CanvasRenderingContext2D, time: number): void {
+  for (const pos of LAYOUT.furniture.plants) {
+    const bx = pos.col * TILE_SIZE + TILE_SIZE / 2;
+    const by = pos.row * TILE_SIZE + TILE_SIZE;
+    const sway = Math.sin(time * 0.001) * 0.5;
+
+    ctx.fillStyle = '#5c3a1a';
+    ctx.fillRect(bx - 3, by - 2, 6, 4);
+    ctx.fillStyle = '#7a4d2a';
+    ctx.fillRect(bx - 2, by - 3, 4, 2);
+
+    ctx.fillStyle = '#1a5c2a';
+    ctx.fillRect(bx - 1, by - 8, 2, 6);
+
+    ctx.fillStyle = '#2d8a4e';
+    ctx.fillRect(Math.round(bx - 4 + sway), by - 12, 3, 3);
+    ctx.fillRect(Math.round(bx + 2 - sway), by - 14, 3, 3);
+    ctx.fillRect(Math.round(bx - 2 + sway * 0.6), by - 16, 4, 3);
+    ctx.fillStyle = '#3aad65';
+    ctx.fillRect(Math.round(bx - 1 + sway * 0.8), by - 18, 3, 3);
   }
 }
 

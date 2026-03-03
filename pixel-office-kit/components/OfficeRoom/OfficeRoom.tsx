@@ -251,14 +251,15 @@ export function OfficeRoom({
             className="or-canvas"
           />
 
-          {agentsDef.slice(0, 4).map((cfg, i) => {
+          {agentsDef.map((cfg, i) => {
             const agent = domAgents.find(a => a.id === cfg.id);
             const ws = WORKSTATIONS[i];
             if (!ws) return null;
             const isAtDesk = agent?.state === 'work' || agent?.state === 'deepfocus';
             const isFocus = agent?.state === 'deepfocus';
             const monX = ws.seatCol * TILE_SIZE - 2;
-            const monY = (ws.deskRows[0] - 2) * TILE_SIZE;
+            const monY = (ws.deskRows[0] - 1) * TILE_SIZE + 6;
+            const monH = TILE_SIZE + 8;
             return (
               <div
                 key={`mon-${cfg.id}`}
@@ -267,7 +268,7 @@ export function OfficeRoom({
                   left: monX * SCALE,
                   top: (monY + 2) * SCALE,
                   width: TILE_SIZE * SCALE,
-                  height: (TILE_SIZE * 2 - 4) * SCALE,
+                  height: (monH - 4) * SCALE,
                 }}
               />
             );
@@ -291,14 +292,19 @@ export function OfficeRoom({
             height: 3 * SCALE,
           }} />
 
-          <svg className="or-lines">
+          <svg className="or-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
             {domAgents.filter(a => a.talkingTo).map(a => {
               const t = domAgents.find(x => x.id === a.talkingTo);
               if (!t) return null;
+              const x1 = (a.x * SCALE / DISPLAY_W) * 100;
+              const y1 = ((a.y + a.sitOffsetY) * SCALE / DISPLAY_H) * 100;
+              const x2 = (t.x * SCALE / DISPLAY_W) * 100;
+              const y2 = ((t.y + t.sitOffsetY) * SCALE / DISPLAY_H) * 100;
               return (
                 <line key={a.id}
-                  x1={a.x * SCALE} y1={(a.y + a.sitOffsetY) * SCALE}
-                  x2={t.x * SCALE} y2={(t.y + t.sitOffsetY) * SCALE}
+                  className="or-talk-line"
+                  x1={`${x1}%`} y1={`${y1}%`}
+                  x2={`${x2}%`} y2={`${y2}%`}
                 />
               );
             })}
@@ -347,6 +353,10 @@ export function OfficeRoom({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={cfg.avatar} alt={cfg.name} width={24} height={24} />
                     </div>
+
+                    {agent.emotion === 'happy' && <span className="or-emotion-icon">😊</span>}
+                    {agent.emotion === 'thinking' && <span className="or-emotion-icon">🤔</span>}
+                    {agent.emotion === 'excited' && <span className="or-emotion-icon">🎉</span>}
 
                     <div className="or-name" style={{ backgroundColor: cfg.color }}>{cfg.name}</div>
 
