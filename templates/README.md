@@ -68,6 +68,8 @@ Templates are runnable, full projects you can start from. Each template is self-
 
 | `034-superpowers-methodology-course` | Superpowers Methodology Course | [`034-superpowers-methodology-course/`](034-superpowers-methodology-course/) |
 
+| `035-system-prompt-audit-service` | System Prompt Audit Service | [`035-system-prompt-audit-service/`](035-system-prompt-audit-service/) |
+
 ## Usage
 
 1. Enter a template directory (example: `templates/001-copyback-studio`).

@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-green-accent: #00ff88;
+  --color-green-dim: #00cc6a;
+  --color-green-dark: #003d20;
+  --color-surface: #141414;
+  --color-surface-light: #1e1e1e;
+  --color-border: #2a2a2a;
+  --color-muted: #888888;
+  --color-danger: #ff4444;
+  --color-warning: #ffaa00;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-mono), monospace;
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-scan-line {
+  animation: scan-line 2s linear infinite;
+}
+
+.animate-pulse-green {
+  animation: pulse-green 2s ease-in-out infinite;
+}

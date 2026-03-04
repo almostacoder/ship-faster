@@ -1,0 +1,5 @@
+{
+  "name": "System Prompt Audit Service",
+  "description": "Scans and scores AI tool system prompts for security leaks, prompt injection vulnerabilities, and IP exposure - charged per scan or subscription.",
+  "requestFramePermissions": []
+}
